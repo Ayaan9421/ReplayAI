@@ -1,0 +1,12 @@
+Open terminal
+
+Run:
+
+vcvars64.bat
+
+
+Compile:
+
+cl /EHsc /std:c++17 file.cpp /I "src" d3d11.lib dxgi.lib dxguid.lib user32.lib
+
+Run the .exe

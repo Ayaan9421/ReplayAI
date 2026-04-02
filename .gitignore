@@ -1,0 +1,12 @@
+Video_Codec_SDK_13.0.19/
+audio.mp3
+audio.wav
+clip.mp4
+clip..mp4
+*.obj
+*.exe
+temp.h264
+temp.ts
+tree.txt
+.vscode/
+video.mp4

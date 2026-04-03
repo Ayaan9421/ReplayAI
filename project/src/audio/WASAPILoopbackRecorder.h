@@ -5,21 +5,38 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include <deque>
 #include <vector>
+#include <mutex>
 #include <fstream>
+
+struct AudioChunk {
+    std::vector<uint8_t> data;  // raw PCM bytes
+    double durationSec;         // duration of this chunk
+};
 
 class WASAPILoopbackRecorder {
 public:
     WASAPILoopbackRecorder();
     ~WASAPILoopbackRecorder();
 
-    bool start(const std::string& outPath);  // starts loopback capture
-    void stop();                              // flushes and closes file
+    bool start(double maxDurationSec = 60.0);
+    void stop();
+
+    // Call on hotkey — writes last N seconds to WAV file
+    bool saveSnapshot(const std::string& outPath);
 
 private:
     void captureLoop();
+    void trimIfNeeded();
+    void writeWav(const std::string& path, const std::deque<AudioChunk>& chunks);
 
-    std::string m_outPath;
+    double m_maxDurationSec = 60.0;
+    double m_currentDurationSec = 0.0;
+
+    std::deque<AudioChunk> m_buffer;
+    std::mutex m_mutex;
+
     std::thread m_thread;
     std::atomic<bool> m_running{ false };
 
@@ -27,12 +44,5 @@ private:
     IMMDevice*           m_device     = nullptr;
     IAudioClient*        m_client     = nullptr;
     IAudioCaptureClient* m_capture    = nullptr;
-
-    // WAV file writing
-    std::ofstream m_file;
-    uint32_t m_dataBytes = 0;
-    WAVEFORMATEX* m_wfx  = nullptr;
-
-    void writeWavHeader();
-    void patchWavHeader();
+    WAVEFORMATEX*        m_wfx        = nullptr;
 };

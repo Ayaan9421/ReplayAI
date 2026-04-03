@@ -5,7 +5,6 @@
 #include <iostream>
 #include <thread>
 
-#include "audio/AudioDeviceManager.h"
 #include "audio/WASAPILoopbackRecorder.h"
 #include "buffer/RollingBufferManager.h"
 #include "capture/ScreenCaptureWGC.h"
@@ -17,11 +16,6 @@
 #include "utils/HotkeyListener.h"
 
 using namespace std;
-
-// TODO: muxing works now.... just now to sync the stuffs ... audio starts fast as its light weight... gotta start both
-// at the same time and stop at the same time or some workaround to get things working...
-// CLUADE FTW  
-// asdafw
 
 int main() {
     winrt::init_apartment(winrt::apartment_type::multi_threaded);
@@ -45,7 +39,7 @@ int main() {
     }
 
     WASAPILoopbackRecorder audio;
-    audio.start("audio.wav");
+    audio.start(60.0);
 
     RollingBufferManager videoBuffer(FPS);
     HotkeyListener hotkey;
@@ -63,8 +57,8 @@ int main() {
 
             auto videoshot = videoBuffer.snapshot();
             videoBuffer.writeToFile(videoshot, "temp.h264");
+            audio.saveSnapshot("audio.wav");
 
-            audio.stop();
             FFmpegMuxer::mux("temp.h264", "audio.wav", "clip.mp4");
             
             exit(0);  // testing

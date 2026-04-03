@@ -17,6 +17,8 @@
 
 using namespace std;
 
+// Everything works 
+
 int main() {
     winrt::init_apartment(winrt::apartment_type::multi_threaded);
     const double FPS = 60.0;

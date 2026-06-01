@@ -28,7 +28,7 @@ bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath, const strin
     double videoDuration  = probeDuration(tsPath);
     double audioDuration  = probeDuration(wavPath);
     double videoStartTime = probeStartTime(tsPath);   // gets the 1.4s
-    double audioSkip      = (audioDuration - videoDuration) + videoStartTime;
+    double audioSkip = audioDuration - videoDuration;
     if (audioSkip < 0) audioSkip = 0;
 
     cout << "[FFmpegMuxer] Video=" << videoDuration 
@@ -39,8 +39,12 @@ bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath, const strin
     char skipBuf[32];
     snprintf(skipBuf, sizeof(skipBuf), "%.3f", audioSkip);
 
+    char startBuf[32];
+    snprintf(startBuf, sizeof(startBuf), "%.3f", videoStartTime);
+
     string cmd2 =
         "ffmpeg -y "
+        "-ss " + string(startBuf) + " "  // seek video to strip the start offset
         "-i \"" + tsPath + "\" "
         "-ss " + string(skipBuf) + " "
         "-f wav -i \"" + wavPath + "\" "

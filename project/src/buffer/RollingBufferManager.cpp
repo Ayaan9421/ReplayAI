@@ -7,19 +7,21 @@ using namespace std;
 
 RollingBufferManager::RollingBufferManager(double maxDurationSec) : m_maxDurationSec(maxDurationSec) {}
 
-void RollingBufferManager::pushFragment(const vector<uint8_t>& encodedData, double durationSec) {
-    EncodedFragment frag;
-    frag.data = encodedData;
-    frag.durationSec = durationSec;
-
-    m_queue.push_back(std::move(frag));
-    m_currentDurationSec += durationSec;
-
+void RollingBufferManager::pushFragment(const EncodedFragment& frag) {
+    m_queue.push_back(frag);
+    m_currentDurationSec += frag.durationSec;
     trimIfNeeded();
 }
 
 void RollingBufferManager::trimIfNeeded() {
     while (m_currentDurationSec > m_maxDurationSec && !m_queue.empty()) {
+        m_currentDurationSec -= m_queue.front().durationSec;
+        m_queue.pop_front();
+    }
+
+    // Then advance forward until we land on an IDR frame
+    // so the buffer always starts at a valid decode point
+    while (!m_queue.empty() && !m_queue.front().isIDR) {
         m_currentDurationSec -= m_queue.front().durationSec;
         m_queue.pop_front();
     }

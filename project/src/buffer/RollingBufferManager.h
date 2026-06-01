@@ -4,10 +4,13 @@
 #include <deque>
 #include <string>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 struct EncodedFragment {
     std::vector<uint8_t> data;
     double durationSec;
+    bool isIDR = false;  // true if this fragment starts with an IDR keyframe
 };
 
 class RollingBufferManager {
@@ -15,8 +18,7 @@ class RollingBufferManager {
     explicit RollingBufferManager(double maxDurationSec);
 
     // push encoded fragment(h264 bytes)
-    void pushFragment(const std::vector<uint8_t>& encodedData, double durationSec);
-
+    void pushFragment(const EncodedFragment& frag);
     // snapshot buffer safely
     std::deque<EncodedFragment> snapshot() const;
 

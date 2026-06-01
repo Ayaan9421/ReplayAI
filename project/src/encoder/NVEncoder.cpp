@@ -76,7 +76,7 @@ bool NVEncoder::createEncoder(uint32_t width, uint32_t height) {
 
     // Keyframe every 2 seconds (120 frames at 60fps)
     // This is the fix for FORCEIDR-on-every-frame
-    m_encConfig.gopLength                = 120;
+    m_encConfig.gopLength      = NVENC_INFINITE_GOPLENGTH;
     m_encConfig.frameIntervalP           = 1;   // IP only, no B-frames (lower latency)
 
     NV_ENC_INITIALIZE_PARAMS init{};
@@ -108,7 +108,7 @@ bool NVEncoder::createEncoder(uint32_t width, uint32_t height) {
     return true;
 }
 
-bool NVEncoder::encodeFrame(ID3D11Texture2D* inputTexture, vector<uint8_t>& outBitstream) {
+bool NVEncoder::encodeFrame(ID3D11Texture2D* inputTexture, vector<uint8_t>& outBitstream, bool& outIsKeyframe) {
 
     // Register this frame's texture — but we do it as lightweight as possible.
     // The real fix vs original: we unregister only when texture CHANGES,
@@ -145,9 +145,19 @@ bool NVEncoder::encodeFrame(ID3D11Texture2D* inputTexture, vector<uint8_t>& outB
     pic.frameIdx        = (uint32_t)m_frameIndex;
     pic.inputTimeStamp  = m_frameIndex;  // monotonic timestamp
 
-    // *** FIX: No FORCEIDR — let GOP structure handle keyframes naturally ***
-    // Only emit SPS/PPS on first frame
-    pic.encodePicFlags  = (m_frameIndex == 0) ? NV_ENC_PIC_FLAG_OUTPUT_SPSPPS : 0;
+    // With this:
+    // Emit SPS/PPS with every keyframe (every gopLength frames = every 2s)
+    // This guarantees the rolling buffer always contains at least one complete
+    // IDR+SPS/PPS within any 60s window, so snapshots are always decodable.
+    bool isKeyframe = ((m_frameIndex % 120) == 0);  // every 2s at 60fps
+
+    pic.encodePicFlags = 0;
+    if (isKeyframe) {
+        // Force an IDR keyframe with fresh SPS/PPS
+        // FORCEIDR tells NVENC to actually produce an IDR now regardless of GOP
+        pic.encodePicFlags = NV_ENC_PIC_FLAG_FORCEIDR | NV_ENC_PIC_FLAG_OUTPUT_SPSPPS;
+    }
+    outIsKeyframe = isKeyframe;
 
     m_frameIndex++;
 

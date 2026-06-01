@@ -17,7 +17,23 @@
 
 using namespace std;
 
-// Everything works 
+// time to build UI with WPF 
+
+#include <iomanip>
+#include <sstream>
+
+std::string getTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(now);
+
+    std::tm tm{};
+    localtime_s(&tm, &t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y%m%d_%H%M%S");
+    return oss.str();
+}
 
 int main() {
     winrt::init_apartment(winrt::apartment_type::multi_threaded);
@@ -57,21 +73,38 @@ int main() {
         if (hotkey.poll()) {
             cout << "[Hotkey] pressed! Saving Last 60 seconds" << endl;
 
+            std::string ts = getTimestamp();
+
+            std::string tempVideo = "temp_" + ts + ".h264";
+            std::string tempAudio = "audio_" + ts + ".wav";
+            std::string finalClip = "clip_" + ts + ".mp4";
+
             auto videoshot = videoBuffer.snapshot();
-            videoBuffer.writeToFile(videoshot, "temp.h264");
-            audio.saveSnapshot("audio.wav");
 
-            FFmpegMuxer::mux("temp.h264", "audio.wav", "clip.mp4");
-            
-            exit(0);  // testing
-            // audio.start(selectedDevice, "audio.mp3");
+            videoBuffer.writeToFile(videoshot, tempVideo);
+            audio.saveSnapshot(tempAudio);
 
-            cout << "[Hotkey] Clip Saved: clip.mp4" << endl;
+            if (FFmpegMuxer::mux(tempVideo, tempAudio, finalClip)) {
+                cout << "[Hotkey] Clip Saved: " << finalClip << endl;
+
+                std::filesystem::remove(tempVideo);
+                std::filesystem::remove(tempAudio);
+            }
+            else {
+                cout << "[Muxer] Failed!" << endl;
+            }
         }
         ID3D11Texture2D* frame = cap.getFrame();
         if (frame) {
             vector<uint8_t> h264;
-            if (encoder->encodeFrame(frame, h264) && !h264.empty()) { videoBuffer.pushFragment(h264, FRAME_DURATION); }
+            bool isKeyframe = false;
+            if (encoder->encodeFrame(frame, h264, isKeyframe) && !h264.empty()) {
+                EncodedFragment frag;
+                frag.data        = h264;
+                frag.durationSec = FRAME_DURATION;
+                frag.isIDR       = isKeyframe;
+                videoBuffer.pushFragment(frag);
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));

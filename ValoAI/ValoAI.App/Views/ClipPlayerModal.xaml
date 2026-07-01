@@ -1,0 +1,129 @@
+﻿<Window x:Class="ValoAI.App.Views.ClipPlayerModal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Width="960" Height="580"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <Grid>
+        <!-- Dim backdrop -->
+        <Border Background="#CC000000"
+                MouseLeftButtonDown="Backdrop_Click"/>
+
+        <!-- Modal container -->
+        <Border Background="{StaticResource BgElevatedBrush}"
+                CornerRadius="10"
+                Width="880" Height="520"
+                ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Video area -->
+                <Grid x:Name="VideoContainer"
+                      Background="Black"
+                      MouseMove="Video_MouseMove">
+
+                    <MediaElement x:Name="Player"
+                                  LoadedBehavior="Manual"
+                                  UnloadedBehavior="Stop"
+                                  Stretch="Uniform"
+                                  MediaOpened="Player_MediaOpened"
+                                  MediaEnded="Player_MediaEnded"/>
+
+                    <!-- Controls overlay — fades in/out on mouse move -->
+                    <Border x:Name="ControlsOverlay"
+                            VerticalAlignment="Bottom"
+                            Opacity="0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="Transparent" Offset="0"/>
+                                <GradientStop Color="#CC000000"   Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+
+                        <StackPanel Margin="16,12">
+                            <!-- Seek bar -->
+                            <Slider x:Name="SeekBar"
+                                    ValueChanged="SeekBar_ValueChanged"
+                                    Thumb.DragStarted="SeekBar_DragStarted"
+                                    Thumb.DragCompleted="SeekBar_DragCompleted"
+                                    Margin="0,0,0,8"
+                                    Foreground="{StaticResource AccentBrush}"/>
+
+                            <DockPanel>
+                                <!-- Play/Pause -->
+                                <Button x:Name="PlayPauseBtn"
+                                        Content="⏸"
+                                        Style="{StaticResource GhostButton}"
+                                        Click="PlayPause_Click"
+                                        Foreground="White"
+                                        FontSize="16"
+                                        DockPanel.Dock="Left"/>
+
+                                <!-- Time display -->
+                                <TextBlock x:Name="TimeDisplay"
+                                           Text="0:00 / 0:00"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0"
+                                           DockPanel.Dock="Left"/>
+
+                                <!-- Volume -->
+                                <Slider x:Name="VolumeSlider"
+                                        Width="80"
+                                        Minimum="0" Maximum="1"
+                                        Value="0.8"
+                                        ValueChanged="Volume_Changed"
+                                        DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0,0,0"/>
+
+                                <TextBlock Text="🔊"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           VerticalAlignment="Center"
+                                           DockPanel.Dock="Right"
+                                           FontSize="13"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Close button -->
+                    <Button Content="✕"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="0,8,8,0"
+                            FontSize="16"
+                            Foreground="White"
+                            Click="Close_Click"/>
+                </Grid>
+
+                <!-- Clip info bar -->
+                <Border Grid.Row="1"
+                        Padding="16,10"
+                        Background="{StaticResource BgSurfaceBrush}">
+                    <DockPanel>
+                        <TextBlock x:Name="ClipTitle"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="13" FontWeight="Medium"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="ClipDate"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   DockPanel.Dock="Right"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

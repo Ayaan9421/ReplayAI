@@ -1,12 +1,61 @@
-#include "FFmpegMuxer.h"
+// #include "FFmpegMuxer.h"
 
+// #include <cstdlib>
+// #include <iostream>
+
+// using namespace std;
+
+// bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath, const string& outMp4, int fps) {
+//     const string tsPath = "temp.ts";
+
+//     // Step 1: h264 -> ts
+//     string cmd1 =
+//         "ffmpeg -y "
+//         "-fflags +genpts "
+//         "-r " + to_string(fps) + " "
+//         "-i \"" + h264Path + "\" "
+//         "-c copy "
+//         "-bsf:v h264_mp4toannexb "
+//         "-f mpegts "
+//         "\"" + tsPath + "\"";
+
+//     cout << "[FFmpegMuxer] " << cmd1 << endl;
+//     if (system(cmd1.c_str()) != 0) {
+//         cout << "[FFmpegMuxer] ERROR: h264->ts failed\n";
+//         return false;
+//     }
+
+//     // No -ss on video at all
+//     string cmd2 =
+//         "ffmpeg -y "
+//         "-i \"" + tsPath + "\" "
+//         "-f wav -i \"" + wavPath + "\" "
+//         "-map 0:v:0 -map 1:a:0 "
+//         "-c:v copy "
+//         "-c:a aac -b:a 192k "
+//         "-movflags +faststart "
+//         "-shortest "
+//         "\"" + outMp4 + "\"";
+        
+//     cout << "[FFmpegMuxer] " << cmd2 << endl;
+//     if (system(cmd2.c_str()) != 0) {
+//         cout << "[FFmpegMuxer] ERROR: mux failed\n";
+//         return false;
+//     }
+
+//     cout << "[FFmpegMuxer] Clip created => " << outMp4 << endl;
+//     return true;
+// }
+
+#include "FFmpegMuxer.h"
 #include <cstdlib>
 #include <iostream>
-
 using namespace std;
 
-bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath, const string& outMp4, int fps) {
-    const string tsPath = "temp.ts";
+bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath,
+                      const string& micPath, const string& outMp4, int fps) {
+    const string tsPath    = "temp.ts";
+    const string noMicClip = "temp_nomicclip.mp4";
 
     // Step 1: h264 -> ts
     string cmd1 =
@@ -25,65 +74,49 @@ bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath, const strin
         return false;
     }
 
-    double videoDuration  = probeDuration(tsPath);
-    double audioDuration  = probeDuration(wavPath);
-    double videoStartTime = probeStartTime(tsPath);   // gets the 1.4s
-    double audioSkip = audioDuration - videoDuration;
-    if (audioSkip < 0) audioSkip = 0;
-
-    cout << "[FFmpegMuxer] Video=" << videoDuration 
-         << "s  Audio=" << audioDuration 
-         << "s  Skipping first " << audioSkip << "s of audio\n";
-
-    
-    char skipBuf[32];
-    snprintf(skipBuf, sizeof(skipBuf), "%.3f", audioSkip);
-
-    char startBuf[32];
-    snprintf(startBuf, sizeof(startBuf), "%.3f", videoStartTime);
-
+    // Step 2: mux video + game audio (the proven working pipeline)
     string cmd2 =
         "ffmpeg -y "
-        "-ss " + string(startBuf) + " "  // seek video to strip the start offset
         "-i \"" + tsPath + "\" "
-        "-ss " + string(skipBuf) + " "
         "-f wav -i \"" + wavPath + "\" "
         "-map 0:v:0 -map 1:a:0 "
         "-c:v copy "
         "-c:a aac -b:a 192k "
         "-movflags +faststart "
         "-shortest "
-        "\"" + outMp4 + "\"";
+        "\"" + noMicClip + "\"";
 
     cout << "[FFmpegMuxer] " << cmd2 << endl;
     if (system(cmd2.c_str()) != 0) {
-        cout << "[FFmpegMuxer] ERROR: mux failed\n";
+        cout << "[FFmpegMuxer] ERROR: video+audio mux failed\n";
         return false;
     }
 
+    // Step 3: mix mic into the already-synced clip
+    // noMicClip has correct duration and sync
+    // mic WAV is same duration as game audio, so we just mix them
+    // amerge combines the existing AAC track with mic, then re-encodes
+    string cmd3 =
+        "ffmpeg -y "
+        "-i \"" + noMicClip + "\" "
+        "-f wav -i \"" + micPath + "\" "
+        "-filter_complex "
+        "\"[0:a][1:a]amix=inputs=2:duration=first:dropout_transition=0[aout]\" "
+        "-map 0:v:0 "
+        "-map \"[aout]\" "
+        "-c:v copy "
+        "-c:a aac -b:a 192k "
+        "-movflags +faststart "
+        "\"" + outMp4 + "\"";
+
+    cout << "[FFmpegMuxer] " << cmd3 << endl;
+    if (system(cmd3.c_str()) != 0) {
+        cout << "[FFmpegMuxer] ERROR: mic mix failed\n";
+        return false;
+    }
+
+    std::remove(tsPath.c_str());
+    std::remove(noMicClip.c_str());
     cout << "[FFmpegMuxer] Clip created => " << outMp4 << endl;
     return true;
-}
-
-double FFmpegMuxer::probeDuration(const string& path) {
-    string cmd = "ffprobe -v error -show_entries format=duration "
-                 "-of csv=p=0 \"" + path + "\"";
-    FILE* pipe = _popen(cmd.c_str(), "r");
-    if (!pipe) return 0.0;
-    char buf[64] = {};
-    fgets(buf, sizeof(buf), pipe);
-    _pclose(pipe);
-    return atof(buf);
-}
-
-double FFmpegMuxer::probeStartTime(const string& path) {
-    string cmd = "ffprobe -v error -show_entries stream=start_time "
-                 "-select_streams v:0 -of csv=p=0 \"" + path + "\"";
-    FILE* pipe = _popen(cmd.c_str(), "r");
-    if (!pipe) return 0.0;
-    char buf[64] = {};
-    fgets(buf, sizeof(buf), pipe);
-    _pclose(pipe);
-    double val = atof(buf);
-    return (val > 0.0 && val < 10.0) ? val : 0.0;
 }

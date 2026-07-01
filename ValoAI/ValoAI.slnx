@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ValoAI.App/ValoAI.App.csproj" Id="d4ec4f7f-5aaa-4475-b51d-715956547864" />
+  <Project Path="ValoAI.Core/ValoAI.Core.vcxproj" />
+  <Project Path="ValoAI.Native/ValoAI.Native.vcxproj" Id="f970bf6c-3442-4376-9160-f8d11973223e" />
+</Solution>

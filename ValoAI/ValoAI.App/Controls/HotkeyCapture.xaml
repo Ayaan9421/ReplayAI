@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="ValoAI.App.Controls.HotkeyCapture"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="True"
+             PreviewKeyDown="OnKeyDown"
+             GotFocus="OnGotFocus"
+             LostFocus="OnLostFocus">
+    <Border x:Name="CaptureBorder"
+            Background="{StaticResource BgSurfaceBrush}"
+            BorderBrush="{StaticResource AccentDimBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12,8"
+            Cursor="Hand"
+            MouseLeftButtonUp="Border_Click">
+        <TextBlock x:Name="DisplayText"
+                   Text="Ctrl + Shift + F9"
+                   Foreground="{StaticResource TextPrimaryBrush}"
+                   FontSize="13"
+                   HorizontalAlignment="Center"/>
+    </Border>
+</UserControl>

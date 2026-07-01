@@ -103,9 +103,14 @@ bool ScreenCaptureWGC::createFramePool() {
         if (FAILED(hr) || !tex) return;
 
         m_latestFrame = tex;
+        m_newFrameAvailable = true;
     });
 
     return true;
 }
 
 ID3D11Texture2D* ScreenCaptureWGC::getFrame() { return m_latestFrame.Get(); }
+
+bool ScreenCaptureWGC::hasNewFrame() { 
+    return m_newFrameAvailable.exchange(false); 
+}

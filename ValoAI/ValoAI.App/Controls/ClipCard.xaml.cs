@@ -8,7 +8,7 @@ using ValoAI.App.Models;
 
 namespace ValoAI.App.Controls;
 
-public partial class ClipCard : UserControl
+public partial class ClipCard : System.Windows.Controls.UserControl
 {
     public event Action<ClipModel>? PlayRequested;
 
@@ -39,7 +39,7 @@ public partial class ClipCard : UserControl
     {
         // Animate accent border
         var colorAnim = new ColorAnimation(
-            (Color)FindResource("Accent"),
+            (System.Windows.Media.Color)FindResource("Accent"),
             new Duration(TimeSpan.FromMilliseconds(150)));
         BorderAccent.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
 
@@ -52,7 +52,7 @@ public partial class ClipCard : UserControl
     private void Card_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
         var colorAnim = new ColorAnimation(
-            (Color)FindResource("BgElevated"),
+            (System.Windows.Media.Color)FindResource("BgElevated"),
             new Duration(TimeSpan.FromMilliseconds(200)));
         BorderAccent.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
 

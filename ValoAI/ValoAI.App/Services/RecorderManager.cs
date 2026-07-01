@@ -16,11 +16,23 @@ public class RecorderManager
 
     public bool IsRunning { get; private set; }
 
-    public void Start(RecorderSettings? settings = null)
+    public void Start(AppSettings? appSettings = null)
     {
         System.Diagnostics.Debug.WriteLine("[ValoAI-CS] Start() begin");
 
-        _settings = settings ?? new RecorderSettings();
+        var s = appSettings ?? AppSettings.Load();
+
+        _settings = new RecorderSettings
+        {
+            ClipsFolder = s.ClipsFolder,
+            BufferDurationSec = s.ClipSizeSec,
+            TargetFps = s.TargetFps,
+            ClipHotkeyVK = s.ClipHotkeyVK,
+            ClipHotkeyMods = s.ClipHotkeyMods,
+            PTTKey1VK = s.PTTKey1VK,
+            MicEnabled = s.MicEnabled,
+        };
+
         _service = new RecorderService();
 
         _service.ClipSaved += OnClipSaved;

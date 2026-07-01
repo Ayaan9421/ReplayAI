@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using ValoAI.App.Helpers;
+using ValoAI.App.Models;
 using ValoAI.App.Services;
 using ValoAI.App.Views;
 using ValoAI.Core;
@@ -28,7 +29,7 @@ public partial class MainWindow : Window
         RecorderManager.Instance.StatusChanged += s =>
             Dispatcher.Invoke(() => RecordingLabel.Text = s);
 
-        Task.Run(() => RecorderManager.Instance.Start());
+        Task.Run(() => RecorderManager.Instance.Start(AppSettings.Load()));
 
         // Register system-wide hotkey Ctrl+Shift+F9
         _hotkey.Register(this, 0x78, 0x0002 | 0x0004);
@@ -52,7 +53,7 @@ public partial class MainWindow : Window
         => WindowState = WindowState.Minimized;
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
-        => Application.Current.Shutdown();
+        => System.Windows.Application.Current.Shutdown();
 
     private void NavButton_Click(object sender, RoutedEventArgs e)
     {
@@ -65,8 +66,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Nav_MouseEnter(object sender, MouseEventArgs e) => ExpandNav();
-    private void Nav_MouseLeave(object sender, MouseEventArgs e) => CollapseNav();
+    private void Nav_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) => ExpandNav();
+    private void Nav_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => CollapseNav();
 
     private void ExpandNav()
     {

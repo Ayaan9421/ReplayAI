@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace ValoAI.App.Controls;
 
-public partial class HotkeyCapture : UserControl
+public partial class HotkeyCapture : System.Windows.Controls.UserControl
 {
     public event Action<int, int>? HotkeyChanged; // (vk, mods)
 
@@ -47,7 +47,7 @@ public partial class HotkeyCapture : UserControl
         DisplayText.Text = FormatHotkey(_vk, _mods);
     }
 
-    private void OnKeyDown(object sender, KeyEventArgs e)
+    private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (!_capturing) return;
         e.Handled = true;

@@ -93,7 +93,7 @@ public partial class ClipPlayerModal : Window
         System.Windows.RoutedPropertyChangedEventArgs<double> e)
         => Player.Volume = VolumeSlider.Value;
 
-    private void Video_MouseMove(object sender, MouseEventArgs e)
+    private void Video_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         ShowControls();
         _controlsTimer.Stop();

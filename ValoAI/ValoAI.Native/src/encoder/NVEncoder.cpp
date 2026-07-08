@@ -24,12 +24,14 @@ static const char* NvEncErrToStr(NVENCSTATUS s) {
 NVEncoder::NVEncoder() = default;
 NVEncoder::~NVEncoder() { shutdown(); }
 
-bool NVEncoder::initialize(ID3D11Device* device, uint32_t width, uint32_t height) {
+bool NVEncoder::initialize(ID3D11Device* device, uint32_t width, uint32_t height, int fps, int bitrateMbps) {
     m_width  = width;
     m_height = height;
+    m_fps = fps;
+    m_bitrate = bitrateMbps;
     if (!initNVENC(device))         return false;
     if (!createEncoder(width, height)) return false;
-    cout << "[NVEncoder] Initialized Successfully (BGRA -> NVENC)\n";
+    cout << "[NVEncoder] Initialized " << width << "x" << height << " @ " << fps << "fps, " << bitrateMbps << "Mbps\n";
     return true;
 }
 
@@ -67,9 +69,9 @@ bool NVEncoder::createEncoder(uint32_t width, uint32_t height) {
     m_encConfig.rcParams.lookaheadDepth  = 0;
 
     m_encConfig.rcParams.rateControlMode = NV_ENC_PARAMS_RC_VBR;
-    m_encConfig.rcParams.averageBitRate  = 20000000;  // 20 Mbps
-    m_encConfig.rcParams.maxBitRate      = 40000000;  // 40 Mbps peak
-    m_encConfig.rcParams.vbvBufferSize   = 40000000;
+    m_encConfig.rcParams.averageBitRate = (uint32_t)(m_bitrate * 1000000);
+    m_encConfig.rcParams.maxBitRate = (uint32_t)(m_bitrate * 2000000);
+    m_encConfig.rcParams.vbvBufferSize = (uint32_t)(m_bitrate * 2000000);
 
     m_encConfig.rcParams.enableAQ        = 1;
     m_encConfig.rcParams.enableTemporalAQ= 1;
@@ -88,8 +90,8 @@ bool NVEncoder::createEncoder(uint32_t width, uint32_t height) {
     init.encodeHeight  = height;
     init.darWidth      = width;
     init.darHeight     = height;
-    init.frameRateNum  = 60;
-    init.frameRateDen  = 1;
+    init.frameRateNum = min((uint32_t)m_fps, 60u);
+    init.frameRateDen = 1;
     init.enablePTD     = 1;
     init.encodeConfig  = &m_encConfig;
     NV_CHECK(m_api.nvEncInitializeEncoder(m_encoder, &init));
@@ -149,7 +151,8 @@ bool NVEncoder::encodeFrame(ID3D11Texture2D* inputTexture, vector<uint8_t>& outB
     // Emit SPS/PPS with every keyframe (every gopLength frames = every 2s)
     // This guarantees the rolling buffer always contains at least one complete
     // IDR+SPS/PPS within any 60s window, so snapshots are always decodable.
-    bool isKeyframe = ((m_frameIndex % 120) == 0);  // every 2s at 60fps
+    int keyframeInterval = min(m_fps, 60) * 2;
+    bool isKeyframe = ((m_frameIndex % keyframeInterval) == 0);  // every 2s at 60fps
 
     pic.encodePicFlags = 0;
     if (isKeyframe) {

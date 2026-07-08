@@ -22,7 +22,7 @@ public:
     MicRollingBuffer();
     ~MicRollingBuffer();
 
-    bool start(double maxDurationSec = 60.0);
+    bool start(double maxDurationSec = 60.0, const std::string& deviceName = "Default");
     void stop();
 
     void setPTT(bool active);  // called from keyboard hook

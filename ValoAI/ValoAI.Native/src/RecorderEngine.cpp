@@ -18,10 +18,10 @@
 #include "audio/MicRollingBuffer.h"
 #include "utils/FFmpegMuxer.h"
 #include "utils/PTTListener.h"
+#include "utils/ValoAILog.h"
 
 using namespace std;
 using namespace std::chrono;
-
 
 
 struct RecorderEngine::Impl {
@@ -85,11 +85,17 @@ bool RecorderEngine::start(const EngineSettings& settings) {
     auto* impl = new Impl();
     impl->settings = settings;
 
+    FileLog("[Engine] Starting: " +
+        std::to_string(settings.width) + "x" +
+        std::to_string(settings.height) + " @ " +
+        std::to_string(settings.targetFps) + "fps, " +
+        std::to_string(settings.bitrateMbps) + "Mbps\n");
+
     if (!impl->d3d.initialize()) { delete impl; return false; }
     if (!impl->cap.initialize(&impl->d3d)) { delete impl; return false; }
 
     impl->encoder = make_unique<NVEncoder>();
-    if (!impl->encoder->initialize(impl->d3d.device(), 1920, 1080)) {
+    if (!impl->encoder->initialize(impl->d3d.device(), settings.width, settings.height, settings.targetFps, settings.bitrateMbps)) {
         delete impl; return false;
     }
 
@@ -99,13 +105,14 @@ bool RecorderEngine::start(const EngineSettings& settings) {
 
     if (settings.micEnabled) {
         impl->mic = new MicRollingBuffer();
-        impl->mic->start(settings.bufferDurationSec);
+        impl->mic->start(settings.bufferDurationSec, settings.micDeviceName);
     }
 
     impl->ptt = new PTTListener();
+    impl->ptt->setKeys(settings.pttKey1, settings.pttKey2);
     impl->ptt->start([impl](bool active) {
         if (impl->mic) impl->mic->setPTT(active);
-        });
+       });
 
     impl->lastFrameTime = steady_clock::now();
     impl->windowStartWallClock = steady_clock::now();
@@ -141,9 +148,10 @@ void RecorderEngine::tick() {
                     impl->videoBuffer->pushFragment(frag);
 
                     double bufDur = impl->videoBuffer->currentDuration();
-                    auto   bd = duration_cast<steady_clock::duration>(
-                        duration<double>(bufDur));
-                    impl->windowStartWallClock = now - bd;
+                    if (bufDur > 1.0) {
+                        auto bd = duration_cast<steady_clock::duration>(duration<double>(bufDur));
+                        impl->windowStartWallClock = now - bd;
+                    }
                 }
             }
         }
@@ -192,9 +200,9 @@ bool RecorderEngine::saveClip(ClipResult& outResult) {
 
     bool ok;
     if (impl->mic)
-        ok = FFmpegMuxer::mux(tempVideo, tempAudio, tempMic, finalClip);
+        ok = FFmpegMuxer::mux(tempVideo, tempAudio, tempMic, finalClip , impl->settings.targetFps, folder);
     else
-        ok = FFmpegMuxer::mux(tempVideo, tempAudio, "", finalClip);
+        ok = FFmpegMuxer::mux(tempVideo, tempAudio, "", finalClip, impl->settings.targetFps, folder);
 
     filesystem::remove(tempVideo);
     filesystem::remove(tempAudio);

@@ -16,5 +16,6 @@ public:
                     const std::string& wavPath,
                     const std::string& micPath,
                     const std::string& outMp4,
-                    int fps = 60);
+                    int fps = 60,
+                    const std::string& clipsFolder = ".");
 };

@@ -44,6 +44,7 @@
     <ClInclude Include="src\utils\FFmpegMuxer.h" />
     <ClInclude Include="src\utils\HotkeyListener.h" />
     <ClInclude Include="src\utils\PTTListener.h" />
+    <ClInclude Include="src\utils\ValoAILog.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

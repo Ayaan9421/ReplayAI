@@ -45,21 +45,20 @@ static bool RunLoggedCommand(const std::string& cmd, std::string& outLog) {
 }
 
 bool FFmpegMuxer::mux(const string& h264Path, const string& wavPath,
-                      const string& micPath, const string& outMp4, int fps) {
-    const string tsPath    = "temp.ts";
-    const string noMicClip = "temp_nomicclip.mp4";
+                      const string& micPath, const string& outMp4, int fps, const string& clipsFolder) {
+    string tsPath = clipsFolder + "\\temp_mux.ts";
+    string noMicClip = clipsFolder + "\\temp_nomicclip.mp4";
 
     // Step 1: h264 -> ts
     string cmd1 =
         "ffmpeg -y "
         "-fflags +genpts "
-        "-r " + to_string(fps) + " "
-        "-i \"" + h264Path + "\" "
+        "-i \"" + h264Path+ "\" "
         "-c copy "
         "-bsf:v h264_mp4toannexb "
         "-f mpegts "
         "\"" + tsPath + "\"";
-
+        //"-r " + to_string(fps) + " "
     cout << "[FFmpegMuxer] " << cmd1 << endl;
     string log;
     if (!RunLoggedCommand(cmd1.c_str(), log)) {

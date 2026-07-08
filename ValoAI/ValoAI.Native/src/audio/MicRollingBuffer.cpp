@@ -5,6 +5,8 @@
 #include <functiondiscoverykeys_devpkey.h>
 #include <propvarutil.h>
 
+#include "utils/ValoAILog.h"
+
 #pragma comment(lib, "propsys.lib")
 #pragma comment(lib, "ole32.lib")
 
@@ -48,7 +50,7 @@ struct WavHeaderExtensible {
 MicRollingBuffer::MicRollingBuffer() {}
 MicRollingBuffer::~MicRollingBuffer() { stop(); }
 
-bool MicRollingBuffer::start(double maxDurationSec) {
+bool MicRollingBuffer::start(double maxDurationSec, const std::string& deviceName) {
     m_maxDurationSec = maxDurationSec;
 
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -63,6 +65,8 @@ bool MicRollingBuffer::start(double maxDurationSec) {
     UINT count = 0;
     collection->GetCount(&count);
 
+    FileLog("[MicBuffer] Enumerating " + std::to_string(count) + " capture devices\n");
+
     for (UINT i = 0; i < count; i++) {
         IMMDevice* dev = nullptr;
         collection->Item(i, &dev);
@@ -74,20 +78,32 @@ bool MicRollingBuffer::start(double maxDurationSec) {
         PropVariantInit(&name);
         props->GetValue(PKEY_Device_FriendlyName, &name);
 
-        // Hardcoded for now — GUI will expose this as a setting later
-        bool isUSBMic = (wcsstr(name.pwszVal, L"USB Audio Device") != nullptr);
+        // Convert to std::string for logging and comparison
+        std::wstring wname(name.pwszVal);
+        std::string sname(wname.begin(), wname.end());
+
+        FileLog("[MicBuffer] Device " + std::to_string(i) + ": " + sname + "\n");
 
         PropVariantClear(&name);
         props->Release();
 
-        if (isUSBMic) {
-            m_device = dev;
-            cout << "[MicBuffer] Found USB mic\n";
-            break;
+        // Don't break early — log all devices first
+        if (!m_device) {  // only pick once
+            bool pick = (deviceName == "Default") ||
+                (sname.find(deviceName) != std::string::npos);
+            if (pick) {
+                m_device = dev;
+                FileLog("[MicBuffer] Selected: " + sname + "\n");
+            }
+            else {
+                dev->Release();
+            }
         }
-        dev->Release();
+        else {
+            dev->Release();
+        }
     }
-    collection->Release();
+    collection->Release();;
 
     if (!m_device) {
         cout << "[MicBuffer] ERROR: USB mic not found\n";
@@ -162,7 +178,11 @@ void MicRollingBuffer::captureLoop() {
                 m_currentDurationSec += chunkDuration;
                 trimIfNeeded();
             }
-
+            static int pttLogCount = 0;
+            if (++pttLogCount % 1000 == 0) {
+                FileLog("[MicBuffer] captureLoop alive, pttActive=" +
+                    std::to_string(m_pttActive.load()) + "\n");
+            }
             m_capture->GetNextPacketSize(&packetSize);
         }
     }

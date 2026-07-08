@@ -13,9 +13,14 @@ struct EngineSettings {
     std::string clipsFolder;
     int         bufferDurationSec = 60;
     int         targetFps = 60;
+    int         width = 1920;
+    int         height = 1080;
+    int         bitrateMbps = 20;
     int         pttKey1 = 0x54;
     int         pttKey2 = 0x55;
     bool        micEnabled = true;
+    std::string micDeviceName = "Default";  // "Default" = use first found
+    int         displayIndex = 0;
 };
 
 class RecorderEngine {

@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)ValoAI.Native\src;$(SolutionDir)ValoAI.Native\src\audio;$(SolutionDir)ValoAI.Native\src\buffer;$(SolutionDir)ValoAI.Native\src\capture;$(SolutionDir)ValoAI.Native\src\core;$(SolutionDir)ValoAI.Native\src\encoder;$(SolutionDir)ValoAI.Native\src\utils;$(SolutionDir)ValoAI.Native\third_party\Video_Codec_SDK_13.0.19\Interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAsManaged>false</CompileAsManaged>
+      <CompileAsManaged>true</CompileAsManaged>
       <AdditionalOptions>/clr:netcore %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>

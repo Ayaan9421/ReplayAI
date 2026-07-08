@@ -10,7 +10,7 @@ class NVEncoder : public IVideoEncoder {
     NVEncoder();
     ~NVEncoder() override;
 
-    bool initialize(ID3D11Device* device, uint32_t width, uint32_t height) override;
+    bool initialize(ID3D11Device* device, uint32_t width, uint32_t height, int fps = 60, int bitrateMbps = 20) override;
 
     bool encodeFrame(ID3D11Texture2D* inputTexture, std::vector<uint8_t>& outBitstream,bool& outIsKeyframe ) override;
 
@@ -26,9 +26,11 @@ class NVEncoder : public IVideoEncoder {
 
     uint32_t m_width = 0;
     uint32_t m_height = 0;
+    int m_fps = 60;
+    int m_bitrate = 20;
 
     uint64_t m_frameIndex = 0;
-    double m_FPS = 60.0;
+
 
     NV_ENC_INPUT_PTR m_inputBuffer = nullptr;
     NV_ENC_REGISTERED_PTR m_registeredResource = nullptr;

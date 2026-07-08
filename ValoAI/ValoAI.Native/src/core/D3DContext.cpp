@@ -3,6 +3,8 @@
 #include<iostream>
 #include<vector>
 
+#include "utils/ValoAILog.h"
+
 using Microsoft::WRL::ComPtr;
 
 D3DContext::D3DContext() = default;
@@ -71,6 +73,21 @@ bool D3DContext::initialize(){
         if (chosenAdapterIndex == -1) chosenAdapterIndex = 0;
     }
     
+    for (size_t j = 0; j < adapterList.size(); j++) {
+        const auto& d = descs[j];
+        std::string name(d.Description, d.Description +
+            wcsnlen(d.Description, 128));
+        // Convert wchar description
+        char nameBuf[256] = {};
+        wcstombs_s(nullptr, nameBuf, d.Description, sizeof(nameBuf) - 1);
+        FileLog("[D3DContext] Adapter " + std::to_string(j) + ": " +
+            std::string(nameBuf) +
+            " VRAM=" + std::to_string(d.DedicatedVideoMemory / 1024 / 1024) +
+            "MB flags=" + std::to_string(d.Flags) + "\n");
+    }
+    FileLog("[D3DContext] Chose adapter index=" +
+        std::to_string(chosenAdapterIndex) + "\n");
+
     adapter = nullptr;
     hr = factory->EnumAdapters1(chosenAdapterIndex, adapter.GetAddressOf());
     if(FAILED(hr)){

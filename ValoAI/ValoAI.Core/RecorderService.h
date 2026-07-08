@@ -18,6 +18,12 @@ namespace ValoAI {
             property int     PTTKey1VK;
             property int     PTTKey2VK;
             property bool    MicEnabled;
+            property int     Width;
+            property int     Height;
+            property int     BitrateMbps;
+            property String^ MicDeviceName;
+            property int     DisplayIndex;
+
 
             RecorderSettings() {
                 ClipsFolder = Environment::GetFolderPath(

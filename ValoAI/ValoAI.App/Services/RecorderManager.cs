@@ -22,16 +22,33 @@ public class RecorderManager
 
         var s = appSettings ?? AppSettings.Load();
 
+        int w = 1920, h = 1080;
+        var parts = s.Resolution.Split('x');
+        if (parts.Length == 2)
+        {
+            int.TryParse(parts[0], out w);
+            int.TryParse(parts[1], out h);
+        }
+
         _settings = new RecorderSettings
         {
             ClipsFolder = s.ClipsFolder,
             BufferDurationSec = s.ClipSizeSec,
             TargetFps = s.TargetFps,
+            Width = w,
+            Height = h,
+            BitrateMbps = s.BitrateMbps,
             ClipHotkeyVK = s.ClipHotkeyVK,
             ClipHotkeyMods = s.ClipHotkeyMods,
             PTTKey1VK = s.PTTKey1VK,
             MicEnabled = s.MicEnabled,
+            MicDeviceName = s.MicDeviceName,
+            DisplayIndex = s.DisplayIndex,
         };
+
+        System.Diagnostics.Debug.WriteLine(
+        $"[ValoAI-CS] Start() — {w}x{h} @ {s.TargetFps}fps, " +
+        $"{s.BitrateMbps}Mbps, folder={s.ClipsFolder}");
 
         _service = new RecorderService();
 

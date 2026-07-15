@@ -13,7 +13,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\ValoAI.ico" />
+    <None Remove="Assets\ValoAI.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ValoAI.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\ValoAI.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

@@ -17,6 +17,7 @@ public partial class ClipCard : System.Windows.Controls.UserControl
     public ClipCard()
     {
         InitializeComponent();
+        CardBorder.BorderBrush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)FindResource("Separator"));
     }
 
     public void SetClip(ClipModel model)
@@ -34,36 +35,39 @@ public partial class ClipCard : System.Windows.Controls.UserControl
             Placeholder.Visibility = Visibility.Collapsed;
         }
     }
-
-    private void Card_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        // Animate accent border
-        var colorAnim = new ColorAnimation(
-            (System.Windows.Media.Color)FindResource("Accent"),
-            new Duration(TimeSpan.FromMilliseconds(150)));
-        BorderAccent.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
-
-        // Fade in hover overlay
-        var fadeIn = new DoubleAnimation(1,
-            new Duration(TimeSpan.FromMilliseconds(150)));
-        HoverOverlay.BeginAnimation(OpacityProperty, fadeIn);
-    }
-
-    private void Card_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        var colorAnim = new ColorAnimation(
-            (System.Windows.Media.Color)FindResource("BgElevated"),
-            new Duration(TimeSpan.FromMilliseconds(200)));
-        BorderAccent.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
-
-        var fadeOut = new DoubleAnimation(0,
-            new Duration(TimeSpan.FromMilliseconds(200)));
-        HoverOverlay.BeginAnimation(OpacityProperty, fadeOut);
-    }
-
     private void Card_Click(object sender,
         System.Windows.Input.MouseButtonEventArgs e)
     {
         if (_model != null) PlayRequested?.Invoke(_model);
+    }
+
+
+    private void Card_MouseEnter(object sender,
+    System.Windows.Input.MouseEventArgs e)
+    {
+        var dur = new Duration(TimeSpan.FromMilliseconds(160));
+        GlowOverlay.BeginAnimation(OpacityProperty, new DoubleAnimation(1, dur));
+        HoverOverlay.BeginAnimation(OpacityProperty, new DoubleAnimation(1, dur));
+
+        // Lift border
+        var borderAnim = new System.Windows.Media.Animation.ColorAnimation(
+            (System.Windows.Media.Color)FindResource("AccentDim"), dur);
+        ((System.Windows.Media.SolidColorBrush)CardBorder.BorderBrush)
+            .BeginAnimation(
+            System.Windows.Media.SolidColorBrush.ColorProperty, borderAnim);
+    }
+
+    private void Card_MouseLeave(object sender,
+        System.Windows.Input.MouseEventArgs e)
+    {
+        var dur = new Duration(TimeSpan.FromMilliseconds(220));
+        GlowOverlay.BeginAnimation(OpacityProperty, new DoubleAnimation(0, dur));
+        HoverOverlay.BeginAnimation(OpacityProperty, new DoubleAnimation(0, dur));
+
+        var borderAnim = new System.Windows.Media.Animation.ColorAnimation(
+            (System.Windows.Media.Color)FindResource("Separator"), dur);
+        ((System.Windows.Media.SolidColorBrush)CardBorder.BorderBrush)
+            .BeginAnimation(
+            System.Windows.Media.SolidColorBrush.ColorProperty, borderAnim);
     }
 }

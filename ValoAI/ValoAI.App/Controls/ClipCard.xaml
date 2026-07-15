@@ -8,82 +8,89 @@
 
     <Border x:Name="CardBorder"
             Background="{StaticResource BgSurfaceBrush}"
+            BorderBrush="{StaticResource SeparatorBrush}"
+            BorderThickness="1"
             CornerRadius="8"
             ClipToBounds="True"
-            Margin="0,0,12,12">
-
-        <!-- Accent flash bar on left edge -->
-        <Border.BorderBrush>
-            <SolidColorBrush x:Name="BorderAccent" Color="#1E1E23"/>
-        </Border.BorderBrush>
-        <Border.BorderThickness>
-            <Thickness Left="3"/>
-        </Border.BorderThickness>
+            Margin="0,0,10,10">
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="120"/>
+                <RowDefinition Height="140"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Thumbnail area -->
-            <Border Background="#111114" CornerRadius="0">
-                <Grid>
-                    <!-- Thumbnail image (shown if exists) -->
-                    <Image x:Name="Thumbnail"
-                           Stretch="UniformToFill"
-                           Opacity="0.85"/>
+            <!-- Thumbnail -->
+            <Grid Background="#0D0D0F">
+                <Image x:Name="Thumbnail"
+                       Stretch="UniformToFill"
+                       Opacity="0.9"/>
 
-                    <!-- Placeholder (shown if no thumbnail) -->
-                    <Border x:Name="Placeholder"
-                            Background="#111114"
-                            Visibility="Visible">
-                        <TextBlock Text="▶"
-                                   Foreground="{StaticResource AccentBrush}"
-                                   FontSize="28"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Opacity="0.7"/>
-                    </Border>
+                <!-- Placeholder -->
+                <Border x:Name="Placeholder"
+                        Background="#111116"
+                        Visibility="Visible">
+                    <TextBlock Text="▶"
+                               Foreground="{StaticResource AccentBrush}"
+                               FontSize="30"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Opacity="0.4"/>
+                </Border>
 
-                    <!-- Hover overlay -->
-                    <Border x:Name="HoverOverlay"
-                            Background="#60000000"
-                            Opacity="0">
-                        <TextBlock Text="▶  PLAY"
-                                   Foreground="White"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                    </Border>
+                <!-- Amber glow overlay on hover -->
+                <Border x:Name="GlowOverlay"
+                        Opacity="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                            <GradientStop Color="#00000000" Offset="0.4"/>
+                            <GradientStop Color="#28F5A623"  Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
 
-                    <!-- Duration badge -->
-                    <Border HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Background="#CC000000"
-                            CornerRadius="3"
-                            Padding="5,2"
-                            Margin="0,0,6,6">
-                        <TextBlock x:Name="DurationText"
-                                   Text="0:00"
-                                   Foreground="White"
-                                   FontSize="11"/>
-                    </Border>
-                </Grid>
-            </Border>
+                <!-- Dark bottom gradient + play text -->
+                <Border x:Name="HoverOverlay"
+                        Opacity="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#00000000" Offset="0.3"/>
+                            <GradientStop Color="#CC000000"  Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <TextBlock Text="▶  PLAY"
+                               Foreground="White"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom"
+                               Margin="0,0,0,10"/>
+                </Border>
+
+                <!-- Duration badge -->
+                <Border HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Background="#CC000000"
+                        CornerRadius="4"
+                        Padding="6,2"
+                        Margin="0,0,8,8">
+                    <TextBlock x:Name="DurationText"
+                               Text="0:00"
+                               Foreground="White"
+                               FontSize="10" FontWeight="Medium"/>
+                </Border>
+            </Grid>
 
             <!-- Metadata -->
-            <StackPanel Grid.Row="1" Margin="10,8,10,10">
+            <StackPanel Grid.Row="1" Margin="12,10,12,12">
+                <TextBlock x:Name="FileNameText"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontSize="12" FontWeight="Medium"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="0,0,0,3"/>
                 <TextBlock x:Name="DateText"
                            Foreground="{StaticResource TextMutedBrush}"
                            FontSize="11"/>
-                <TextBlock x:Name="FileNameText"
-                           Foreground="{StaticResource TextPrimaryBrush}"
-                           FontSize="12"
-                           FontWeight="Medium"
-                           Margin="0,2,0,0"
-                           TextTrimming="CharacterEllipsis"/>
             </StackPanel>
         </Grid>
     </Border>

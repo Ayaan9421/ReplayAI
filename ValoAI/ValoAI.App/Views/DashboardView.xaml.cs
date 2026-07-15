@@ -34,14 +34,29 @@ public partial class DashboardView : Page
         });
     }
 
+    private void OpenModal(ValoAI.App.Models.ClipModel clip)
+    {
+        var modal = new ClipPlayerModal(clip)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        modal.ShowDialog();
+    }
+
+    private void ViewAll_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (Window.GetWindow(this) is MainWindow mw)
+            mw.NavigateTo("Clips");
+    }
+
     private void LoadRecentClips()
     {
         ClipGrid.Children.Clear();
+        var clips = RecorderManager.Instance.GetAllClips().Take(4).ToList();
 
-        var clips = RecorderManager.Instance
-            .GetAllClips()
-            .Take(4)
-            .ToList();
+        EmptyState.Visibility = clips.Count == 0
+            ? System.Windows.Visibility.Visible
+            : System.Windows.Visibility.Collapsed;
 
         foreach (var clip in clips)
         {
@@ -50,14 +65,5 @@ public partial class DashboardView : Page
             card.PlayRequested += OpenModal;
             ClipGrid.Children.Add(card);
         }
-    }
-
-    private void OpenModal(ValoAI.App.Models.ClipModel clip)
-    {
-        var modal = new ClipPlayerModal(clip)
-        {
-            Owner = Window.GetWindow(this)
-        };
-        modal.ShowDialog();
     }
 }

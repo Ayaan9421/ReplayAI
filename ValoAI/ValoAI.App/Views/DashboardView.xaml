@@ -4,93 +4,167 @@
       Background="{StaticResource BgBaseBrush}"
       Title="Dashboard">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="32,28,32,32">
+        <StackPanel Margin="36,32,36,36">
 
             <!-- Greeting -->
             <TextBlock Text="Hey, Wraith693 👋"
                        Foreground="{StaticResource TextPrimaryBrush}"
-                       FontSize="26" FontWeight="Bold"
+                       FontSize="28" FontWeight="Bold"
                        Margin="0,0,0,4"/>
-            <TextBlock Text="Here's what's been happening."
+            <TextBlock Text="Your clips are being captured in the background."
                        Foreground="{StaticResource TextMutedBrush}"
-                       FontSize="14" Margin="0,0,0,32"/>
+                       FontSize="13" Margin="0,0,0,36"/>
 
-            <!-- Stats heading -->
-            <TextBlock Text="STATS"
-                       Foreground="{StaticResource TextMutedBrush}"
-                       FontSize="11" FontWeight="SemiBold"
-                       Margin="0,0,0,12"/>
+            <!-- Divider -->
+            <Border Height="1" Background="{StaticResource SeparatorBrush}"
+                    Margin="0,0,0,28"/>
 
-            <!-- Stats cards row -->
+            <!-- Stats label -->
+            <DockPanel Margin="0,0,0,16">
+                <TextBlock Text="STATS"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="10" FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="via tracker.gg — coming soon"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="10" Opacity="0.5"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Stats cards -->
             <UniformGrid Columns="4" Margin="0,0,0,40">
+                <!-- Clips Today -->
                 <Border Background="{StaticResource BgSurfaceBrush}"
-                        CornerRadius="8" Margin="0,0,12,0" Padding="20,18">
-                    <StackPanel>
-                        <TextBlock Text="CLIPS TODAY"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" FontWeight="SemiBold"/>
-                        <TextBlock Text="—"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="32" FontWeight="Bold" Margin="0,4,0,0"/>
-                    </StackPanel>
+                        CornerRadius="8" Margin="0,0,10,0"
+                        BorderBrush="{StaticResource SeparatorBrush}"
+                        BorderThickness="1">
+                    <Grid>
+                        <!-- Accent top bar -->
+                        <Border Height="2" Background="{StaticResource AccentBrush}"
+                                CornerRadius="8,8,0,0"
+                                VerticalAlignment="Top"/>
+                        <StackPanel Margin="18,18,18,16">
+                            <TextBlock Text="CLIPS TODAY"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="9" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="StatClipsToday"
+                                       Text="—"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="34" FontWeight="Bold"
+                                       Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
+
+                <!-- Total Clips -->
                 <Border Background="{StaticResource BgSurfaceBrush}"
-                        CornerRadius="8" Margin="0,0,12,0" Padding="20,18">
-                    <StackPanel>
-                        <TextBlock Text="TOTAL CLIPS"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" FontWeight="SemiBold" />
-                        <TextBlock Text="—"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="32" FontWeight="Bold" Margin="0,4,0,0"/>
-                    </StackPanel>
+                        CornerRadius="8" Margin="0,0,10,0"
+                        BorderBrush="{StaticResource SeparatorBrush}"
+                        BorderThickness="1">
+                    <Grid>
+                        <Border Height="2" Background="{StaticResource SeparatorBrush}"
+                                CornerRadius="8,8,0,0"
+                                VerticalAlignment="Top"/>
+                        <StackPanel Margin="18,18,18,16">
+                            <TextBlock Text="TOTAL CLIPS"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="9" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="StatTotalClips"
+                                       Text="—"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="34" FontWeight="Bold"
+                                       Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
+
+                <!-- K/D -->
                 <Border Background="{StaticResource BgSurfaceBrush}"
-                        CornerRadius="8" Margin="0,0,12,0" Padding="20,18">
-                    <StackPanel>
-                        <TextBlock Text="K/D RATIO"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" FontWeight="SemiBold" />
-                        <TextBlock Text="—"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="32" FontWeight="Bold" Margin="0,4,0,0"/>
-                        <TextBlock Text="tracker.gg coming soon"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" Margin="0,2,0,0"/>
-                    </StackPanel>
+                        CornerRadius="8" Margin="0,0,10,0"
+                        BorderBrush="{StaticResource SeparatorBrush}"
+                        BorderThickness="1">
+                    <Grid>
+                        <Border Height="2" Background="{StaticResource SeparatorBrush}"
+                                CornerRadius="8,8,0,0"
+                                VerticalAlignment="Top"/>
+                        <StackPanel Margin="18,18,18,16">
+                            <TextBlock Text="K/D RATIO"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="9" FontWeight="SemiBold"/>
+                            <TextBlock Text="—"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="34" FontWeight="Bold"
+                                       Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
+
+                <!-- Win Rate -->
                 <Border Background="{StaticResource BgSurfaceBrush}"
-                        CornerRadius="8" Padding="20,18">
-                    <StackPanel>
-                        <TextBlock Text="WIN RATE"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" FontWeight="SemiBold" />
-                        <TextBlock Text="—"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="32" FontWeight="Bold" Margin="0,4,0,0"/>
-                        <TextBlock Text="tracker.gg coming soon"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="10" Margin="0,2,0,0"/>
-                    </StackPanel>
+                        CornerRadius="8"
+                        BorderBrush="{StaticResource SeparatorBrush}"
+                        BorderThickness="1">
+                    <Grid>
+                        <Border Height="2" Background="{StaticResource SeparatorBrush}"
+                                CornerRadius="8,8,0,0"
+                                VerticalAlignment="Top"/>
+                        <StackPanel Margin="18,18,18,16">
+                            <TextBlock Text="WIN RATE"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="9" FontWeight="SemiBold"/>
+                            <TextBlock Text="—"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="34" FontWeight="Bold"
+                                       Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </UniformGrid>
 
-            <!-- Recent clips heading -->
-            <TextBlock Text="RECENT CLIPS"
-                       Foreground="{StaticResource TextMutedBrush}"
-                       FontSize="11" FontWeight="SemiBold"
-                       Margin="0,0,0,12"/>
+            <!-- Recent Clips -->
+            <DockPanel Margin="0,0,0,16">
+                <TextBlock Text="RECENT CLIPS"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="10" FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <Button x:Name="ViewAllBtn"
+                        Content="View all →"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalAlignment="Right"
+                        Foreground="{StaticResource AccentBrush}"
+                        FontSize="12"
+                        Click="ViewAll_Click"/>
+            </DockPanel>
 
-            <!-- Clip cards — placeholder -->
-            <UniformGrid x:Name="ClipGrid" Columns="4" Margin="0,0,0,16">
-                <!-- Populated from code-behind -->
-            </UniformGrid>
+            <!-- Clip grid -->
+            <UniformGrid x:Name="ClipGrid" Columns="4" Margin="0,0,0,8"/>
 
-            <Button Content="View all clips →"
-                    Style="{StaticResource GhostButton}"
-                    HorizontalAlignment="Right"
-                    Foreground="{StaticResource AccentBrush}"
-                    FontSize="13"/>
+            <!-- Empty state -->
+            <Border x:Name="EmptyState"
+                    Background="{StaticResource BgSurfaceBrush}"
+                    BorderBrush="{StaticResource SeparatorBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="0,48"
+                    Visibility="Collapsed">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="▶"
+                               Foreground="{StaticResource AccentBrush}"
+                               FontSize="32" Opacity="0.4"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,12"/>
+                    <TextBlock Text="No clips yet"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="15" FontWeight="Medium"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,6"/>
+                    <TextBlock Text="Press Ctrl + Shift + F9 to save your first clip."
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="13"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
 
         </StackPanel>
     </ScrollViewer>

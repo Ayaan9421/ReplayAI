@@ -1,11 +1,12 @@
-﻿using System.IO;
+﻿using Microsoft.Win32;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
-using ValoAI.App.Models;
 using ValoAI.App.Controls;
-using System.Runtime.InteropServices;
 using ValoAI.App.Helpers;
+using ValoAI.App.Models;
+using ValoAI.App.Services;
 
 namespace ValoAI.App.Views;
 
@@ -97,6 +98,9 @@ public partial class SettingsView : Page
         // Mic
         MicEnabledCheck.IsChecked = _settings.MicEnabled;
         SelectComboByContent(MicDeviceCombo, _settings.MicDeviceName);
+
+        // Startup
+        StartupCheck.IsChecked = StartupService.IsStartupEnabled();
     }
 
     // ── Display enumeration via Win32 ─────────────────────────────
@@ -211,6 +215,12 @@ public partial class SettingsView : Page
             _settings.MicDeviceName = micItem.Tag?.ToString() ?? "Default";
 
         _settings.MicEnabled = MicEnabledCheck.IsChecked == true;
+
+
+        if (StartupCheck.IsChecked == true)
+            StartupService.Enable();
+        else
+            StartupService.Disable();
 
         _settings.Save();
 

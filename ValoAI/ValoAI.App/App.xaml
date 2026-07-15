@@ -142,7 +142,7 @@
             </Style>
 
             <!-- ── ComboBox ── -->
-            <Style TargetType="ComboBox">
+            <!--<Style TargetType="ComboBox">
                 <Setter Property="Background"        Value="{StaticResource BgElevatedBrush}"/>
                 <Setter Property="Foreground"        Value="{StaticResource TextPrimaryBrush}"/>
                 <Setter Property="BorderBrush"       Value="{StaticResource SeparatorBrush}"/>
@@ -185,8 +185,8 @@
                                             Margin="0,4,0,0"
                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
                                         <ScrollViewer MaxHeight="200"
-                                                      VerticalScrollBarVisibility="Auto">
-                                            <ItemsPresenter/>
+                                                      VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
                                         </ScrollViewer>
                                     </Border>
                                 </Popup>
@@ -200,6 +200,124 @@
                                     <Setter TargetName="bd" Property="BorderBrush"
                                             Value="{StaticResource AccentBrush}"/>
                                 </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>-->
+
+            <!-- ── ComboBox ── -->
+            <Style TargetType="ComboBox">
+                <Setter Property="Background" Value="{StaticResource BgElevatedBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="10,6"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+
+                                <!-- Main Control -->
+                                <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6">
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="32"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                IsHitTestVisible="False"/>
+
+                                        <ToggleButton
+                                Grid.Column="1"
+                                Focusable="False"
+                                IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                Background="Transparent"
+                                BorderThickness="0">
+                                            <ToggleButton.Template>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border Background="Transparent">
+                                                        <TextBlock Text="▼"
+                           FontSize="10"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </ToggleButton.Template>
+
+                                            <TextBlock Text="▼"
+                                           FontSize="10"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Popup -->
+                                <Popup x:Name="PART_Popup"
+                           Placement="Bottom"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           PopupAnimation="Fade">
+
+                                    <Border
+                            Background="{StaticResource BgElevatedBrush}"
+                            BorderBrush="{StaticResource SeparatorBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Margin="0,4,0,0"
+                            MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+
+                                        <ScrollViewer
+                                MaxHeight="250"
+                                CanContentScroll="True">
+
+                                            <ItemsPresenter
+                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+
+                                    </Border>
+
+                                </Popup>
+
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border"
+                                Property="BorderBrush"
+                                Value="{StaticResource AccentDimBrush}"/>
+                                </Trigger>
+
+                                <Trigger Property="IsDropDownOpen" Value="True">
+                                    <Setter TargetName="Border"
+                                Property="BorderBrush"
+                                Value="{StaticResource AccentBrush}"/>
+                                </Trigger>
+
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </Trigger>
+
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

@@ -25,7 +25,7 @@ bool D3DContext::initialize(){
     ComPtr<IDXGIFactory1> factory;
     hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(factory.GetAddressOf()));
     if(FAILED(hr)) {
-        cout << "[D3DContext] Failed to create DXGI Factory" << endl;
+        FileLog("[D3DContext] Failed to create DXGI Factory");
         return false;
     }
 
@@ -44,7 +44,7 @@ bool D3DContext::initialize(){
     }
 
     if(adapterList.empty()) {
-        cout << "[D3DContext] No GPU Adapters Found." << endl;
+        FileLog("[D3DContext] No GPU Adapters Found.");
         factory->Release();
         return false;
     }

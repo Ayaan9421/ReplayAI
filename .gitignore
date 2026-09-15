@@ -119,4 +119,5 @@ venv/
 __pycache__/
 hub/
 models/
-
+!hub/.gitkeep
+!models/.gitkeep

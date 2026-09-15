@@ -1,0 +1,13 @@
+flask
+waitress
+torch==2.13.0+cu132
+torchvision==0.28.0+cu132
+transformers==5.15.1
+peft==0.20.0
+bitsandbytes==0.50.1
+accelerate==1.14.0
+pillow==12.2.0
+decord==0.6.0
+opencv-python-headless==5.0.0.93
+
+--extra-index-url https://download.pytorch.org/whl/cu132
